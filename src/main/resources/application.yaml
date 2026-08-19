@@ -1,3 +1,8 @@
 spring:
-  application:
-    name: spaceexplorer-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spaceexplorer
+    username: dev
+    password: dev
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
