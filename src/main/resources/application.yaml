@@ -3,6 +3,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/spaceexplorer
     username: dev
     password: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
 logging:
   level:
     org.hibernate.SQL: DEBUG
