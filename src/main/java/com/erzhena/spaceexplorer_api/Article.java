@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+// да, только внутренний. Привязан к схеме таблицы, наружу уходить не должен
+// entity, объект под управлением Hibernate, живёт только в слое работы с базой. Не DTO
 @Entity
 @Getter
 @Setter
