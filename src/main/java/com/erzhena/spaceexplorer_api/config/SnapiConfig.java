@@ -1,4 +1,4 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

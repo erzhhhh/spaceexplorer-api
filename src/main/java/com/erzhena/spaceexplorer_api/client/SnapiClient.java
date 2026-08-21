@@ -1,5 +1,7 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.client;
 
+import com.erzhena.spaceexplorer_api.client.dto.SnapiArticle;
+import com.erzhena.spaceexplorer_api.client.dto.SnapiArticlesResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 

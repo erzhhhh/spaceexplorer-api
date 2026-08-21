@@ -1,5 +1,10 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.service;
 
+import com.erzhena.spaceexplorer_api.client.SnapiClient;
+import com.erzhena.spaceexplorer_api.client.dto.SnapiArticle;
+import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
+import com.erzhena.spaceexplorer_api.entity.Article;
+import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

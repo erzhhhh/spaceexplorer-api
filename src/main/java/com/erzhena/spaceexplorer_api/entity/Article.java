@@ -1,4 +1,4 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

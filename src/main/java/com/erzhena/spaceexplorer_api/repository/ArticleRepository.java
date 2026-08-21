@@ -1,5 +1,6 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.repository;
 
+import com.erzhena.spaceexplorer_api.entity.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 // ArticleRepository — да, бин. Но объявлен третьим способом:
