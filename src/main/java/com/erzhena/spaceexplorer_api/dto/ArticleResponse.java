@@ -1,4 +1,6 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.dto;
+
+import com.erzhena.spaceexplorer_api.entity.Article;
 
 import java.time.Instant;
 

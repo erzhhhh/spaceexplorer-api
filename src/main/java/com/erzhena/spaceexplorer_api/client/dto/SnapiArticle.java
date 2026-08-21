@@ -1,4 +1,4 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.client.dto;
 
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;

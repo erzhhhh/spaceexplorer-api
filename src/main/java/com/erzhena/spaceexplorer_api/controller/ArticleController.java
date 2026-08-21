@@ -1,5 +1,7 @@
-package com.erzhena.spaceexplorer_api;
+package com.erzhena.spaceexplorer_api.controller;
 
+import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
+import com.erzhena.spaceexplorer_api.service.ArticleService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
