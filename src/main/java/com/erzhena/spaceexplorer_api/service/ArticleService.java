@@ -8,7 +8,10 @@ import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service // @Inject constructor --- это бин
 public class ArticleService {
@@ -35,12 +38,24 @@ public class ArticleService {
     public int importFromSnapi(int limit) {
         List<SnapiArticle> fetched = snapiClient.fetchArticles(limit);
 
-        List<Article> articles = fetched.stream()
+        List<Long> ids = fetched.stream()
+                .map(SnapiArticle::id)
+                .toList();
+
+        Map<Long, Instant> known = repository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Article::getId, Article::getUpdatedAt));
+
+        List<Article> toSave = fetched.stream()
+                .filter(dto -> isNewOrChanged(dto, known.get(dto.id())))
                 .map(this::toEntity)
                 .toList();
 
-        repository.saveAll(articles);
-        return articles.size();
+        repository.saveAll(toSave);
+        return toSave.size();
+    }
+
+    private boolean isNewOrChanged(SnapiArticle dto, Instant knownUpdatedAt) {
+        return knownUpdatedAt == null || dto.updatedAt().isAfter(knownUpdatedAt);
     }
 
     private Article toEntity(SnapiArticle dto) {
