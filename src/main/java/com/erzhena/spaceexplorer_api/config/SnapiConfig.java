@@ -27,8 +27,7 @@ public class SnapiConfig {
         factory2.setReadTimeout(Duration.ofSeconds(5));
 
         return RestClient.builder()
-//                .baseUrl("https://api.spaceflightnewsapi.net/v4")
-                .baseUrl("https://api.spaceflightnewsapi.invalid/v4")
+                .baseUrl("https://api.spaceflightnewsapi.net/v4")
                 .requestFactory(factory)
                 .build();
     }
