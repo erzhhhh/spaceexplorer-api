@@ -6,6 +6,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  http:
+    client:
+      connect-timeout: 3s
+      read-timeout: 5s
 logging:
   level:
     org.hibernate.SQL: DEBUG
