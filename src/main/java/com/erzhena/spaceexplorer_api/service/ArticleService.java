@@ -6,6 +6,8 @@ import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
 import com.erzhena.spaceexplorer_api.entity.Article;
 import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,11 +26,10 @@ public class ArticleService {
         this.snapiClient = snapiClient;
     }
 
-    public List<ArticleResponse> getAll() {
-        return repository.findAll()
-                .stream()
-                .map(ArticleResponse::from)
-                .toList();
+    public Page<ArticleResponse> getAll(Pageable pageable) {
+        // TODO: use Slice instead of Page
+        return repository.findAll(pageable)
+                .map(ArticleResponse::from);
     }
 
     // Аннотация над методом означает: всё, что происходит внутри, —
