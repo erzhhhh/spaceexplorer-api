@@ -1,7 +1,7 @@
 package com.erzhena.spaceexplorer_api.controller;
 
 import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
-import com.erzhena.spaceexplorer_api.dto.PageResponse;
+import com.erzhena.spaceexplorer_api.dto.SliceResponse;
 import com.erzhena.spaceexplorer_api.service.ArticleService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,10 +22,10 @@ public class ArticleController {
     }
 
     @GetMapping // get - не меняет состояние сервера. Тело не нужно
-    public PageResponse<ArticleResponse> getAll(
+    public SliceResponse<ArticleResponse> getAll(
             @PageableDefault(size = 20, sort = "publishedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return PageResponse.from(service.getAll(pageable));
+        return SliceResponse.from(service.getAll(pageable));
     }
 
     @PostMapping("/import") // post - меняет состояние сервера. Может быть без тела
