@@ -8,6 +8,7 @@ import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,9 +27,8 @@ public class ArticleService {
         this.snapiClient = snapiClient;
     }
 
-    public Page<ArticleResponse> getAll(Pageable pageable) {
-        // TODO: use Slice instead of Page
-        return repository.findAll(pageable)
+    public Slice<ArticleResponse> getAll(Pageable pageable) {
+        return repository.findAllBy(pageable)
                 .map(ArticleResponse::from);
     }
 
