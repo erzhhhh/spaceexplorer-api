@@ -1,4 +1,9 @@
 spring:
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+        default-page-size: 20
   datasource:
     url: jdbc:postgresql://localhost:5432/spaceexplorer
     username: dev
