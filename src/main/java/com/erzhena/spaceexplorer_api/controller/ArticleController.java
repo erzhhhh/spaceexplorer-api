@@ -23,7 +23,7 @@ public class ArticleController {
 
     @GetMapping // get - не меняет состояние сервера. Тело не нужно
     public SliceResponse<ArticleResponse> getAll(
-            @PageableDefault(sort = "publishedAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = {"publishedAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return SliceResponse.from(service.getAll(pageable));
     }
