@@ -1,0 +1,1 @@
+CREATE INDEX idx_article_published_at_id ON article (published_at DESC, id DESC);
