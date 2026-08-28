@@ -1,15 +1,13 @@
 package com.erzhena.spaceexplorer_api.controller;
 
 import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
+import com.erzhena.spaceexplorer_api.dto.CursorResponse;
 import com.erzhena.spaceexplorer_api.dto.SliceResponse;
 import com.erzhena.spaceexplorer_api.service.ArticleService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController // @Inject constructor --- это бин
 @RequestMapping("/api/articles")
@@ -22,11 +20,20 @@ public class ArticleController {
     }
 
     @GetMapping // get - не меняет состояние сервера. Тело не нужно
-    public SliceResponse<ArticleResponse> getAll(
+    public SliceResponse<ArticleResponse> getByOffset(
             @PageableDefault(sort = {"publishedAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return SliceResponse.from(service.getAll(pageable));
+        return service.getByOffset(pageable);
     }
+
+//    // сделать версия 2 контроллера
+//    @GetMapping
+//    public CursorResponse<ArticleResponse> getByCursor(
+//            @RequestParam String cursor,
+//            @RequestParam(defaultValue = "20") int size
+//    ) {
+//        return service.getByCursor(cursor, size);
+//    }
 
     @PostMapping("/import") // post - меняет состояние сервера. Может быть без тела
     public int importArticles() {
