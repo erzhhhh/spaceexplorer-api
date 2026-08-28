@@ -22,10 +22,10 @@ public class ArticleController {
     }
 
     @GetMapping // get - не меняет состояние сервера. Тело не нужно
-    public SliceResponse<ArticleResponse> getAll(
+    public SliceResponse<ArticleResponse> getByOffset(
             @PageableDefault(sort = {"publishedAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return SliceResponse.from(service.getAll(pageable));
+        return service.getByOffset(pageable);
     }
 
     @PostMapping("/import") // post - меняет состояние сервера. Может быть без тела

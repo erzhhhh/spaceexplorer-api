@@ -2,11 +2,13 @@ package com.erzhena.spaceexplorer_api.service;
 
 import com.erzhena.spaceexplorer_api.client.SnapiClient;
 import com.erzhena.spaceexplorer_api.client.dto.SnapiArticle;
+import com.erzhena.spaceexplorer_api.dto.ArticleCursor;
 import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
+import com.erzhena.spaceexplorer_api.dto.CursorResponse;
+import com.erzhena.spaceexplorer_api.dto.SliceResponse;
 import com.erzhena.spaceexplorer_api.entity.Article;
 import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -27,9 +29,38 @@ public class ArticleService {
         this.snapiClient = snapiClient;
     }
 
-    public Slice<ArticleResponse> getAll(Pageable pageable) {
-        return repository.findAllBy(pageable)
+    public SliceResponse<ArticleResponse> getByOffset(Pageable pageable) {
+        Slice<ArticleResponse> slice = repository.findAllBy(pageable)
                 .map(ArticleResponse::from);
+
+        return SliceResponse.from(slice);
+    }
+
+    public CursorResponse<ArticleResponse> getByCursor(String cursor, int size) {
+        int limit = size + 1;
+
+        List<Article> articles;
+        if (cursor == null) {
+            articles = repository.findLatest(limit);
+        } else {
+            ArticleCursor articleCursor = ArticleCursor.decode(cursor);
+            articles = repository.findOlderThan(articleCursor.publishedAt(), articleCursor.id(), limit);
+        }
+
+        boolean hasNext = articles.size() > size;
+        if (hasNext) {
+            articles = articles.subList(0, size);
+        }
+
+        String nextCursor = null;
+        if (hasNext) {
+            Article last = articles.getLast();
+            nextCursor = new ArticleCursor(last.getPublishedAt(), last.getId()).encode();
+        }
+
+        List<ArticleResponse> content = articles.stream().map(ArticleResponse::from).toList();
+
+        return new CursorResponse<>(content, nextCursor);
     }
 
     // Аннотация над методом означает: всё, что происходит внутри, —
