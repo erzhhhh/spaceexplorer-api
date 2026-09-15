@@ -35,7 +35,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             SELECT * FROM article
             ORDER BY published_at DESC, id DESC
             LIMIT :limit
-            """, nativeQuery = true)
+            """,
+            nativeQuery = true)
     List<Article> findLatest(@Param("limit") int limit);
 
     @Query(value = """
@@ -43,7 +44,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             WHERE (published_at, id) < (CAST(:publishedAt AS timestamptz), :id)
             ORDER BY published_at DESC, id DESC
             LIMIT :limit
-            """, nativeQuery = true)
+            """,
+            nativeQuery = true)
     List<Article> findOlderThan(@Param("publishedAt") Instant publishedAt,
                                 @Param("id") Long id,
                                 @Param("limit") int limit);
