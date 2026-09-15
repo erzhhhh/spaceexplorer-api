@@ -1,5 +1,7 @@
 package com.erzhena.spaceexplorer_api.dto;
 
+import com.erzhena.spaceexplorer_api.exception.InvalidCursorException;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -22,10 +24,14 @@ public record ArticleCursor(Instant publishedAt, long id) {
         // getUrlEncoder — вариант, безопасный для URL. Обычный Base64 использует символы + и /, а в адресе они имеют
         // своё значение и всё ломают. URL-вариант заменяет их на - и _.
         // withoutPadding — убирает символы = в конце. Они тоже мешаются в URL и ничего не значат.
-        String raw = new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
-        int sep = raw.indexOf('_');
-        return new ArticleCursor(
-                Instant.parse(raw.substring(0, sep)),
-                Long.parseLong(raw.substring(sep + 1)));
+        try {
+            String raw = new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
+            int sep = raw.indexOf('_');
+            return new ArticleCursor(
+                    Instant.parse(raw.substring(0, sep)),
+                    Long.parseLong(raw.substring(sep + 1)));
+        } catch (RuntimeException e) {
+            throw new InvalidCursorException(value);
+        }
     }
 }
