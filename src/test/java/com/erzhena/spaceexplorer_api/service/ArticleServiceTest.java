@@ -2,7 +2,11 @@ package com.erzhena.spaceexplorer_api.service;
 
 import com.erzhena.spaceexplorer_api.client.SnapiClient;
 import com.erzhena.spaceexplorer_api.client.dto.SnapiArticle;
+import com.erzhena.spaceexplorer_api.dto.ArticleCursor;
+import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
+import com.erzhena.spaceexplorer_api.dto.CursorResponse;
 import com.erzhena.spaceexplorer_api.entity.Article;
+import com.erzhena.spaceexplorer_api.exception.InvalidCursorException;
 import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,7 +67,7 @@ class ArticleServiceTest {
         when(snapiClient.fetchArticles(10)).thenReturn(List.of(article));
 
         // The article exists in the DB
-        Article existing = existingArticle(1L, OLD_DATE);
+        Article existing = article(1L, OLD_DATE);
         when(repository.findAllById(List.of(1L))).thenReturn(List.of(existing));
 
         int saved = service.importFromSnapi(10);
@@ -78,7 +82,7 @@ class ArticleServiceTest {
         when(snapiClient.fetchArticles(10)).thenReturn(List.of(article));
 
         // The article exists in the DB with an older updatedAt
-        Article existing = existingArticle(1L, OLD_DATE);
+        Article existing = article(1L, OLD_DATE);
         when(repository.findAllById(List.of(1L))).thenReturn(List.of(existing));
 
         int saved = service.importFromSnapi(10);
@@ -98,7 +102,7 @@ class ArticleServiceTest {
         when(snapiClient.fetchArticles(10)).thenReturn(List.of(article));
 
         // The article exists in the DB with a fresher updatedAt
-        Article existing = existingArticle(1L, NEW_DATE);
+        Article existing = article(1L, NEW_DATE);
         when(repository.findAllById(List.of(1L))).thenReturn(List.of(existing));
 
         int saved = service.importFromSnapi(10);
@@ -118,8 +122,8 @@ class ArticleServiceTest {
 
         // DB has articles 2 and 3, both with the old date
         when(repository.findAllById(List.of(1L, 2L, 3L))).thenReturn(List.of(
-                existingArticle(2L, OLD_DATE),
-                existingArticle(3L, OLD_DATE)
+                article(2L, OLD_DATE),
+                article(3L, OLD_DATE)
         ));
 
         int saved = service.importFromSnapi(10);
@@ -140,7 +144,7 @@ class ArticleServiceTest {
         when(snapiClient.fetchArticles(10))
                 .thenThrow(new RuntimeException("SNAPI is unavailable"));
 
-        // import() method should rethrow it
+        // importFromSnapi() should rethrow it
         assertThatThrownBy(() -> service.importFromSnapi(10))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("SNAPI is unavailable");
@@ -149,10 +153,101 @@ class ArticleServiceTest {
         verify(repository, never()).saveAll(any());
     }
 
-    private Article existingArticle(Long id, Instant updatedAt) {
+    @Test
+    void getByCursorReturnsFirstPageWithoutNextCursor() {
+        // No cursor: the service asks for size + 1 latest articles: there is no next page
+        when(repository.findLatest(11)).thenReturn(List.of(
+                article(2L, NEW_DATE),
+                article(1L, OLD_DATE)
+        ));
+
+        CursorResponse<ArticleResponse> response = service.getByCursor(null, 10);
+
+        assertThat(response.content()).hasSize(2);
+        assertThat(response.nextCursor()).isNull();
+        verify(repository, never()).findOlderThan(any(), any(), anyInt());
+    }
+
+    @Test
+    void getByCursorTrimsExtraArticleAndReturnsNextCursor() {
+        // The repository returns size + 1 articles: there is a next page
+        when(repository.findLatest(3)).thenReturn(List.of(
+                article(3L, NEW_DATE, NEW_DATE),
+                article(2L, NEW_DATE, NEW_DATE),
+                article(1L, OLD_DATE, OLD_DATE)
+        ));
+
+        CursorResponse<ArticleResponse> response = service.getByCursor(null, 2);
+
+        assertThat(response.content())
+                .extracting(ArticleResponse::id)
+                .containsExactly(3L, 2L);
+        assertThat(response.nextCursor()).isNotNull();
+        verify(repository, never()).findOlderThan(any(), any(), anyInt());
+    }
+
+    @Test
+    void getByCursorLoadsArticlesOlderThanCursor() {
+        String cursor = new ArticleCursor(NEW_DATE, 2L).encode();
+
+        // Articles older than the date from the cursor
+        when(repository.findOlderThan(NEW_DATE, 2L, 11)).thenReturn(List.of(
+                article(1L, OLD_DATE)
+        ));
+
+        CursorResponse<ArticleResponse> response = service.getByCursor(cursor, 10);
+
+        assertThat(response.content())
+                .extracting(ArticleResponse::id)
+                .containsExactly(1L);
+        assertThat(response.nextCursor()).isNull();
+        verify(repository, never()).findLatest(anyInt());
+    }
+
+    @Test
+    void getByCursorBuildsNextCursorFromLastReturnedArticle() {
+        when(repository.findLatest(3)).thenReturn(List.of(
+                article(3L, NEW_DATE, NEW_DATE),
+                article(2L, NEW_DATE, NEW_DATE),  // last on this page
+                article(1L, OLD_DATE, OLD_DATE)   // extra
+        ));
+
+        CursorResponse<ArticleResponse> response = service.getByCursor(null, 2);
+
+        // The cursor points to article 2, not to the extra article 1
+        ArticleCursor next = ArticleCursor.decode(response.nextCursor());
+        assertThat(next.id()).isEqualTo(2L);
+        assertThat(next.publishedAt()).isEqualTo(NEW_DATE);
+    }
+
+    @Test
+    void getByCursorReturnsNoNextCursorWhenExactlySizeArticles() {
+        when(repository.findLatest(3)).thenReturn(List.of(
+                article(2L, NEW_DATE),
+                article(1L, OLD_DATE)
+        ));
+
+        CursorResponse<ArticleResponse> response = service.getByCursor(null, 2);
+
+        assertThat(response.content()).hasSize(2);
+        assertThat(response.nextCursor()).isNull();
+    }
+
+    @Test
+    void getByCursorThrowsOnInvalidCursor() {
+        assertThatThrownBy(() -> service.getByCursor("not-a-cursor", 10))
+                .isInstanceOf(InvalidCursorException.class);
+    }
+
+    private Article article(Long id, Instant updatedAt) {
+        return article(id, updatedAt, null);
+    }
+
+    private Article article(Long id, Instant updatedAt, Instant publishedAt) {
         Article article = new Article();
         article.setId(id);
         article.setUpdatedAt(updatedAt);
+        article.setPublishedAt(publishedAt);
         return article;
     }
 
