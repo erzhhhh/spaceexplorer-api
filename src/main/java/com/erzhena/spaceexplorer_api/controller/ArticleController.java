@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController // @Inject constructor --- это бин
+@RestController
 @RequestMapping("/api/articles")
 public class ArticleController {
 
