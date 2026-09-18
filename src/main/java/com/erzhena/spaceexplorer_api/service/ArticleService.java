@@ -8,10 +8,10 @@ import com.erzhena.spaceexplorer_api.dto.CursorResponse;
 import com.erzhena.spaceexplorer_api.dto.SliceResponse;
 import com.erzhena.spaceexplorer_api.entity.Article;
 import com.erzhena.spaceexplorer_api.repository.ArticleRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
