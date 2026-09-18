@@ -18,3 +18,5 @@ spring:
 logging:
   level:
     org.hibernate.SQL: DEBUG
+snapi:
+  base-url: https://api.spaceflightnewsapi.net/v4

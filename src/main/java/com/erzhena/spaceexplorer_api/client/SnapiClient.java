@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
-@Component // @Inject constructor --- это бин
+@Component // Это как @Inject constructor --- это бин
 public class SnapiClient {
 
     private final RestClient restClient;
