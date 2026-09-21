@@ -3,6 +3,8 @@ package com.erzhena.spaceexplorer_api.controller;
 import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
 import com.erzhena.spaceexplorer_api.dto.CursorResponse;
 import com.erzhena.spaceexplorer_api.service.ArticleService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +20,7 @@ public class ArticleV2Controller {
     @GetMapping
     public CursorResponse<ArticleResponse> getByCursor(
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size
     ) {
         return service.getByCursor(cursor, size);
     }

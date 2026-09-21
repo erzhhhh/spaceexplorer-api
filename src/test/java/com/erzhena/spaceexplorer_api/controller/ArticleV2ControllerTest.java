@@ -18,8 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest(ArticleV2Controller.class)
 class ArticleV2ControllerTest {
@@ -116,6 +115,26 @@ class ArticleV2ControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
                 .extractingPath("$.title").isEqualTo("Invalid cursor");
+    }
+
+    @Test
+    void getByCursorReturns400WhenSizeIsTooSmall() {
+        assertThat(mvc.get().uri("/api/v2/articles")
+                .param("cursor", "abc")
+                .param("size", "0"))
+                .hasStatus(HttpStatus.BAD_REQUEST);
+
+        verify(service, never()).getByCursor(any(), anyInt());
+    }
+
+    @Test
+    void getByCursorReturns400WhenSizeIsTooBig() {
+        assertThat(mvc.get().uri("/api/v2/articles")
+                .param("cursor", "abc")
+                .param("size", "101"))
+                .hasStatus(HttpStatus.BAD_REQUEST);
+
+        verify(service, never()).getByCursor(any(), anyInt());
     }
 
     @Test
