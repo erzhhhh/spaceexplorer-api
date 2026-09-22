@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,10 +25,5 @@ public class ArticleController {
             @PageableDefault(sort = {"publishedAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return service.getByOffset(pageable);
-    }
-
-    @PostMapping("/import") // post - меняет состояние сервера. Может быть без тела
-    public int importArticles() {
-        return service.importFromSnapi(20);
     }
 }
