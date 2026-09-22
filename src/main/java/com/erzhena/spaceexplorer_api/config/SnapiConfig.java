@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-@Configuration // Это как @Module
+@Configuration // Это как @Module. Внутри меня инструкции: как создать другие бины и что включить
 public class SnapiConfig {
 
     @Bean
