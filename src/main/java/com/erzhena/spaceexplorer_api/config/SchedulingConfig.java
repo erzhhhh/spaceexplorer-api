@@ -1,5 +1,6 @@
 package com.erzhena.spaceexplorer_api.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -8,5 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // По умолчанию Spring не ищет методы с @Scheduled. Аннотация @EnableScheduling
 // включает эту функцию: при старте Spring находит все такие методы и запускает для них таймеры.
 @EnableScheduling
+@ConditionalOnProperty(name = "app.scheduling.enabled", havingValue = "true", matchIfMissing = true)
 public class SchedulingConfig {
 }
