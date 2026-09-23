@@ -1,6 +1,8 @@
 app:
   scheduling:
     enabled: true
+  import:
+    interval: PT15M
 spring:
   data:
     web:
