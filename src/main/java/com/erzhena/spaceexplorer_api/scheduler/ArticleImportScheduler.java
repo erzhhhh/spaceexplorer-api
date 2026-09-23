@@ -18,7 +18,7 @@ public class ArticleImportScheduler {
     }
 
     // Spring сам вызывает этот метод по таймеру через 15 минут после окончания предыдущего запуска
-    @Scheduled(fixedDelayString = "PT15M")
+    @Scheduled(fixedDelayString = "${app.import.interval}")
     public void importArticles() {
         int saved = service.importFromSnapi(20);
         log.info("Scheduled import finished: {} articles saved", saved);
