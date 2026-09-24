@@ -3,6 +3,7 @@ package com.erzhena.spaceexplorer_api.controller;
 import com.erzhena.spaceexplorer_api.dto.ArticleResponse;
 import com.erzhena.spaceexplorer_api.dto.CursorResponse;
 import com.erzhena.spaceexplorer_api.service.ArticleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v2/articles")
+@Tag(name = "Articles (cursor pagination)")
 public class ArticleV2Controller {
 
     private final ArticleService service;
