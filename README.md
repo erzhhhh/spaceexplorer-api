@@ -2,7 +2,7 @@
 
 REST API for a space news feed. The service fetches articles from the [Spaceflight News API](https://api.spaceflightnewsapi.net/v4/docs/) (SNAPI), stores them in PostgreSQL and serves them to clients with pagination.
 
-![Tests](https://github.com/erzhhhh/spaceexplorer-api/actions/workflows/tests.yaml/badge.svg)
+![Tests](https://github.com/erzhhhh/spaceexplorer-api/actions/workflows/tests.yml/badge.svg)
 
 ## Features
 
