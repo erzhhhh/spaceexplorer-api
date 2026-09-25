@@ -27,22 +27,20 @@ REST API for a space news feed. The service fetches articles from the [Spaceflig
 
 ## Running locally
 
-Requires JDK 21 and Docker.
+Requires Docker.
 
 ```bash
-# start PostgreSQL
-docker compose up -d
-
-# run the application
-./mvnw spring-boot:run
+docker compose up --build
 ```
 
-The application starts on `http://localhost:8080`. It imports articles from SNAPI on startup and every 15 minutes after that, so the database fills up on its own.
+This starts PostgreSQL and the application. The API is available at
+`http://localhost:8080`, interactive docs at `http://localhost:8080/swagger-ui.html`.
 
-Check that it works:
+To work on the code, start only the database and run the application from your IDE:
 
 ```bash
-curl "http://localhost:8080/api/v2/articles?size=5"
+docker compose up -d db
+./mvnw spring-boot:run
 ```
 
 ## API
