@@ -28,7 +28,7 @@ class ImportControllerTest {
         when(service.importFromSnapi(20)).thenReturn(5);
 
         // Send POST /api/articles/import
-        assertThat(mvc.post().uri("/api/admin/import"))
+        assertThat(mvc.post().uri("/api/admin/import").header("X-Api-Key", "local-dev-key"))
                 .hasStatusOk()
                 .bodyText().isEqualTo("5");
 
@@ -42,7 +42,7 @@ class ImportControllerTest {
                 new SnapiUnavailableException("SNAPI down", new RuntimeException())
         );
 
-        assertThat(mvc.post().uri("/api/admin/import"))
+        assertThat(mvc.post().uri("/api/admin/import").header("X-Api-Key", "local-dev-key"))
                 .hasStatus(HttpStatus.SERVICE_UNAVAILABLE)
                 .bodyJson()
                 .extractingPath("$.title").isEqualTo("News source unavailable");
