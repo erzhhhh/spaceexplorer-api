@@ -1,0 +1,10 @@
+services:
+  db:
+    ports: !reset []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  app:
+    environment:
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      ADMIN_API_KEY: ${ADMIN_API_KEY}
