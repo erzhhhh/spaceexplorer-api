@@ -4,6 +4,15 @@ REST API for a space news feed. The service fetches articles from the [Spaceflig
 
 ![Tests](https://github.com/erzhhhh/spaceexplorer-api/actions/workflows/tests.yml/badge.svg)
 
+## Live demo
+
+The API runs at `http://64.226.126.101:8080`.
+
+- Interactive docs: http://64.226.126.101:8080/swagger-ui.html
+- Example request: http://64.226.126.101:8080/api/v2/articles?size=5
+
+Articles are imported from SNAPI every 15 minutes, so the feed stays current.
+
 ## Features
 
 - Two ways to read the feed: offset pagination and cursor pagination
@@ -23,6 +32,7 @@ REST API for a space news feed. The service fetches articles from the [Spaceflig
 | Maven | build |
 | JUnit 5, Mockito, AssertJ | tests |
 | Testcontainers | tests against a real database |
+| Docker Compose | local and production runtime |
 | GitHub Actions | test run on every pull request |
 
 ## Running locally
@@ -49,7 +59,8 @@ docker compose up -d db
 |---|---|---|
 | `GET` | `/api/articles` | list articles, offset pagination |
 | `GET` | `/api/v2/articles` | list articles, cursor pagination |
-| `POST` | `/api/admin/import` | trigger an import from SNAPI manually |
+| `POST` | `/api/admin/import` | trigger an import from SNAPI manually (requires the `X-Api-Key` header) |
+| `GET` | `/actuator/health` | application and database status |
 
 ### GET /api/v2/articles
 
@@ -78,6 +89,17 @@ Pass the `nextCursor` value as the `cursor` parameter to get the next page. When
 
 Parameters: `page` (defaults to 0), `size` (defaults to 20, max 100), `sort`. Articles are sorted by publication date, newest first.
 
+### POST /api/admin/import
+
+Triggers an import without waiting for the schedule. The endpoint writes to the database and calls an external API, so it is closed with an API key:
+
+```bash
+curl -X POST http://localhost:8080/api/admin/import \
+  -H "X-Api-Key: local-dev-key"
+```
+
+The public article endpoints need no key.
+
 ### Errors
 
 ```json
@@ -93,6 +115,7 @@ Parameters: `page` (defaults to 0), `size` (defaults to 20, max 100), `sort`. Ar
 | Status | When |
 |---|---|
 | `400` | malformed cursor, or `size` outside 1–100 |
+| `401` | missing or wrong `X-Api-Key` on an admin endpoint |
 | `503` | SNAPI is unreachable during an import |
 
 ## Why two pagination styles
@@ -121,11 +144,28 @@ Integration tests need Docker running: they start PostgreSQL through Testcontain
 
 Tests run automatically on every pull request to `main`.
 
+## Deployment
+
+The service runs on a DigitalOcean droplet (Ubuntu) with Docker Compose. Updating it:
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+`compose.prod.yaml` is layered on top of the base file and changes two things:
+
+- the database port mapping is removed, so PostgreSQL is reachable only by the application inside the Docker network and not from the internet
+- passwords and the admin API key come from an `.env` file that lives on the server and is never committed
+
+The droplet firewall allows only SSH and port 8080. Note that Docker publishes ports around the firewall, which is why the mapping has to be dropped in the overlay rather than blocked with firewall rules.
+
 ## Configuration
 
 | Property | Default | Purpose |
 |---|---|---|
 | `snapi.base-url` | `https://api.spaceflightnewsapi.net/v4` | external API address |
 | `app.scheduling.enabled` | `true` | scheduled import; turned off in tests |
+| `app.admin.api-key` | `local-dev-key` | key for admin endpoints, from `ADMIN_API_KEY` |
 | `spring.http.client.connect-timeout` | `3s` | connection timeout for SNAPI |
 | `spring.http.client.read-timeout` | `5s` | read timeout for SNAPI |
