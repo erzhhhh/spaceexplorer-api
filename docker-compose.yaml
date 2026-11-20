@@ -15,6 +15,16 @@ services:
       timeout: 3s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT:
+    container_name: spaceexplorer-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+
   app:
     build: .
     ports:
